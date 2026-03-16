@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PMPB — Comandos Regionais</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===== RESET ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Source Sans 3', Arial, sans-serif;
+      background-color: #f2f4f7;
+      color: #2c3344;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      background-color: #0b2144;
+      display: flex;
+      justify-content: center;
+      border-bottom: 3px solid #c9a227;
+      flex-wrap: wrap;
+    }
+    nav a {
+      color: #d4c48a;
+      text-decoration: none;
+      padding: 14px 20px;
+      display: block;
+      font-family: 'Oswald', Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -3px;
+    }
+    nav a:hover, nav a.active {
+      background-color: rgba(201, 162, 39, 0.12);
+      color: #f0d870;
+      border-bottom-color: #c9a227;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      width: 100%;
+      padding: 24px 1rem 28px;
+      text-align: center;
+      background: linear-gradient(135deg, #0b2144 0%, #163566 100%);
+      border-bottom: 4px solid #c9a227;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent, transparent 20px,
+        rgba(255,255,255,0.02) 20px, rgba(255,255,255,0.02) 40px
+      );
+    }
+    .brasao-img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 12px;
+      position: relative;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+    }
+    header h1 {
+      font-family: 'Oswald', Arial, sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: #f0d870;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      position: relative;
+    }
+    header p.subtitulo {
+      font-size: 11px;
+      color: #8eaad4;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      position: relative;
+    }
+
+    /* ===== CONTEÚDO ===== */
+    .conteudo {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.5rem 1.5rem 2rem;
+      flex: 1;
+    }
+    .conteudo h2 {
+      font-family: 'Oswald', Arial, sans-serif;
+      font-size: 17px;
+      font-weight: 500;
+      color: #0b2144;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #c9a227;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .conteudo h2::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background: #c9a227;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .conteudo p {
+      font-size: 15px;
+      color: #445060;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    /* ===== CARDS ===== */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 6px;
+      border: 0.5px solid #d0d6df;
+      border-top: 3px solid #0b2144;
+      padding: 14px 18px;
+      transition: box-shadow 0.2s ease, border-top-color 0.2s ease;
+    }
+    .card:hover {
+      border-top-color: #c9a227;
+      box-shadow: 0 4px 16px rgba(11, 33, 68, 0.1);
+    }
+    .card-label {
+      font-family: 'Oswald', Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #163566;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 4px;
+    }
+    .card-valor {
+      font-size: 13px;
+      color: #556070;
+      line-height: 1.4;
+    }
+
+    /* ===== BADGES ===== */
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .badge {
+      display: inline-block;
+      background: #edf2fb;
+      color: #163566;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border: 0.5px solid #b0c2e0;
+    }
+    .badge-ouro { background: #faf3dc; color: #7a5c00; border-color: #e0c96a; }
+
+    /* ===== MAPA ===== */
+    #mapa {
+      width: 100%;
+      height: 520px;
+      border-radius: 6px;
+      border: 0.5px solid #d0d6df;
+      box-shadow: 0 2px 12px rgba(11,33,68,0.1);
+      margin-bottom: 2rem;
+    }
+
+    /* ===== LABEL MUNICÍPIO ===== */
+    .label-municipio {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      font-family: 'Source Sans 3', Arial, sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      color: #1a1a2e;
+      text-transform: uppercase;
+      text-shadow:
+        -1px -1px 0 rgba(255,255,255,0.85),
+         1px -1px 0 rgba(255,255,255,0.85),
+        -1px  1px 0 rgba(255,255,255,0.85),
+         1px  1px 0 rgba(255,255,255,0.85),
+         0px  1px 3px rgba(0,0,0,0.3);
+      pointer-events: none;
+      white-space: nowrap;
+      letter-spacing: 0.04em;
+    }
+
+    /* ===== LABEL COMANDO REGIONAL ===== */
+    .label-comando-regional {
+      background: rgba(10, 36, 99, 0.82);
+      border: 1px solid rgba(255, 215, 0, 0.6);
+      border-radius: 3px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+      padding: 4px 10px 3px;
+      font-family: 'Oswald', Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: #f0e060;
+      text-transform: uppercase;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+      pointer-events: none;
+      white-space: nowrap;
+      backdrop-filter: blur(2px);
+    }
+
+    /* ===== POPUP ===== */
+    .leaflet-popup-content-wrapper {
+      background: #0d1b3e;
+      border: 1px solid #2a4a8a;
+      border-top: 3px solid #c8a200;
+      border-radius: 4px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.55);
+      color: #e8eaf0;
+      font-family: 'Source Sans 3', Arial, sans-serif;
+      font-size: 13px;
+    }
+    .leaflet-popup-content strong {
+      font-family: 'Oswald', Arial, sans-serif;
+      font-size: 15px;
+      letter-spacing: 0.07em;
+      color: #f0d060;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 4px;
+      border-bottom: 1px solid rgba(200,162,0,0.35);
+      padding-bottom: 5px;
+    }
+    .leaflet-popup-tip { background: #0d1b3e; }
+    .leaflet-popup-close-button { color: #8899cc !important; }
+    .leaflet-popup-close-button:hover { color: #f0d060 !important; }
+
+    /* ===== PAINEL INFO ===== */
+    .info-panel {
+      background: rgba(10, 28, 80, 0.92);
+      border: 1px solid #2a4a8a;
+      border-left: 4px solid #c8a200;
+      border-radius: 4px;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.5);
+      padding: 10px 14px;
+      font-family: 'Source Sans 3', Arial, sans-serif;
+      font-size: 13px;
+      color: #c8d0e8;
+      min-width: 180px;
+    }
+    .info-panel h4 {
+      font-family: 'Oswald', Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: #f0d060;
+      text-transform: uppercase;
+      margin: 0 0 8px 0;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(200,162,0,0.3);
+    }
+    .info-panel b { color: #fff; }
+
+    /* ===== LEGENDA ===== */
+    .legenda-mapa {
+      background: rgba(10, 28, 80, 0.92);
+      border: 1px solid #2a4a8a;
+      border-radius: 4px;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.5);
+      padding: 10px 14px;
+      font-family: 'Source Sans 3', Arial, sans-serif;
+      font-size: 12px;
+      color: #c8d0e8;
+      line-height: 1.8;
+    }
+    .legenda-mapa h4 {
+      font-family: 'Oswald', Arial, sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      color: #f0d060;
+      text-transform: uppercase;
+      margin: 0 0 8px 0;
+    }
+    .legenda-mapa i {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      margin-right: 7px;
+      vertical-align: middle;
+      border-radius: 2px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: #0b2144;
+      border-top: 3px solid #c9a227;
+      text-align: center;
+      padding: 16px;
+      font-size: 12px;
+      color: #6a83a8;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="#" class="active">Início</a>
+    <a href="#">Comandos</a>
+    <a href="#">Efetivo</a>
+    <a href="#">Mapa</a>
+    <a href="#">Contato</a>
+  </nav>
+
+  <header>
+    <img
+      src="BRASAO-PMPB.png"
+      alt="Brasão da Polícia Militar da Paraíba"
+      class="brasao-img"
+    >
+    <h1>Polícia Militar da Paraíba</h1>
+    <p class="subtitulo">Comandos Regionais — Divisão Territorial</p>
+  </header>
+
+  <div class="conteudo">
+
+    <h2>Visão Geral dos Comandos</h2>
+
+    <div class="badges">
+      <span class="badge badge-ouro">✦ CPRM</span>
+      <span class="badge">223 Municípios</span>
+      <span class="badge">Estado da Paraíba</span>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-label">CPRM</div>
+        <div class="card-valor">Comando de Policiamento Regional Metropolitano</div>
+      </div>
+      <div class="card">
+        <div class="card-label">CPR - I</div>
+        <div class="card-valor">Comando de Policiamento Regional I</div>
+      </div>
+      <div class="card">
+        <div class="card-label">CPR - II</div>
+        <div class="card-valor">Comando de Policiamento Regional II</div>
+      </div>
+      <div class="card">
+        <div class="card-label">CPR - III</div>
+        <div class="card-valor">Comando de Policiamento Regional III</div>
+      </div>
+    </div>
+
+    <h2>Mapa de Divisão Regional</h2>
+
+    <div id="mapa"></div>
+
+  </div>
+
+  <footer>
+    &copy; Polícia Militar da Paraíba — Todos os direitos reservados
+  </footer>
+
+  <script>
+    // ============================================================
+    // INICIALIZAÇÃO DO MAPA
+    // ============================================================
+    var mapa = L.map('mapa').setView([-7.2, -36.8], 7);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      opacity: 0.5
+    }).addTo(mapa);
+
+    // ============================================================
+    // ESTILOS DOS POLÍGONOS
+    // ============================================================
+    var estiloPadrao = {
+      color: '#1a3a6e',
+      weight: 1.2,
+      fillColor: '#2d5fa6',
+      fillOpacity: 0.35
+    };
+
+    var estiloDestaque = {
+      color: '#c9a227',
+      weight: 2.5,
+      fillColor: '#4a80cc',
+      fillOpacity: 0.55
+    };
+
+    // ============================================================
+    // PAINEL DE INFORMAÇÃO (canto superior direito)
+    // ============================================================
+    var info = L.control({ position: 'topright' });
+
+    info.onAdd = function () {
+      this._div = L.DomUtil.create('div', 'info-panel');
+      this.update();
+      return this._div;
+    };
+
+    info.update = function (p) {
+      if (p) {
+        this._div.innerHTML =
+          '<h4>' + (p.NM_MUN || 'Município') + '</h4>' +
+          '<p>Cód. IBGE: <b>' + (p.CD_MUN || '—') + '</b></p>' +
+          '<p>Área: <b>' + parseFloat(p.AREA_KM2 || 0).toFixed(2) + ' km²</b></p>';
+      } else {
+        this._div.innerHTML = '<h4>Informações</h4><p>Passe o mouse sobre um município</p>';
+      }
+    };
+
+    info.addTo(mapa);
+
+    // ============================================================
+    // LEGENDA (canto inferior direito)
+    // ============================================================
+    var legenda = L.control({ position: 'bottomright' });
+
+    legenda.onAdd = function () {
+      var div = L.DomUtil.create('div', 'legenda-mapa');
+      div.innerHTML =
+        '<h4>Comandos Regionais</h4>' +
+        '<i style="background:#2d5fa6"></i> CPRM<br>' +
+        '<i style="background:#2a7a4a"></i> CPR - I<br>' +
+        '<i style="background:#8a3a2a"></i> CPR - II<br>' +
+        '<i style="background:#6a3a8a"></i> CPR - III';
+      return div;
+    };
+
+    legenda.addTo(mapa);
+
+    // ============================================================
+    // CAMADA DE MUNICÍPIOS (GeoJSON)
+    // Substitua dadosMunicipios pelo seu arquivo GeoJSON real
+    // ============================================================
+    var camadaMunicipios;
+
+    function onEachFeature(feature, layer) {
+      var p = feature.properties;
+
+      // Popup com dados do município
+      layer.bindPopup(
+        '<strong>' + (p.NM_MUN || 'Município') + '</strong>' +
+        'Cód. IBGE: ' + (p.CD_MUN || '—') + '<br>' +
+        'Área: ' + parseFloat(p.AREA_KM2 || 0).toFixed(2) + ' km²'
+      );
+
+      // Label permanente com o nome da cidade no centro do polígono
+      layer.bindTooltip((p.NM_MUN || ''), {
+        permanent: true,
+        direction: 'center',
+        className: 'label-municipio'
+      });
+
+      // Eventos de interação
+      layer.on({
+        mouseover: function (e) {
+          e.target.setStyle(estiloDestaque);
+          e.target.bringToFront();
+          info.update(p);
+        },
+        mouseout: function (e) {
+          camadaMunicipios.resetStyle(e.target);
+          info.update();
+        },
+        click: function (e) {
+          mapa.fitBounds(e.target.getBounds());
+          layer.openPopup();
+        }
+      });
+    }
+
+    // ============================================================
+    // CARREGAR O GEOJSON
+    // Opção A: dados inline (substitua dadosMunicipios pelo objeto)
+    // Opção B: fetch externo (descomente o bloco abaixo)
+    // ============================================================
+
+    /*
+    // OPÇÃO B — carregar GeoJSON externo
+    fetch('municipios_pb.geojson')
+      .then(function(r){ return r.json(); })
+      .then(function(dados){
+        camadaMunicipios = L.geoJSON(dados, {
+          style: estiloPadrao,
+          onEachFeature: onEachFeature
+        }).addTo(mapa);
+        mapa.fitBounds(camadaMunicipios.getBounds());
+      });
+    */
+
+    // OPÇÃO A — dados inline (exemplo mínimo para demonstração)
+    // Substitua por seu GeoJSON completo da Paraíba
+    var dadosMunicipios = {
+      "type": "FeatureCollection",
+      "features": []
+      // Cole aqui os features do seu GeoJSON
+    };
+
+    camadaMunicipios = L.geoJSON(dadosMunicipios, {
+      style: estiloPadrao,
+      onEachFeature: onEachFeature
+    }).addTo(mapa);
+
+    if (dadosMunicipios.features.length > 0) {
+      mapa.fitBounds(camadaMunicipios.getBounds());
+    }
+  </script>
+
+</body>
+</html>
